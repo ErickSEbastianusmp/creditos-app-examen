@@ -28,10 +28,10 @@ public static class DbInitializer
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         if (!string.IsNullOrEmpty(connectionString) && connectionString.Contains("Data Source=", StringComparison.OrdinalIgnoreCase))
         {
-            var parts = connectionString.Split("Data Source=", StringComparison.OrdinalIgnoreCase);
-            if (parts.Length > 1)
+            var parts = connectionString.Split(new[] { "Data Source=" }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length > 0)
             {
-                var dbPath = parts[1].Split(";")[0];
+                var dbPath = parts[0].Split(';')[0].Trim();
                 var directory = Path.GetDirectoryName(dbPath);
                 if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
                 {
