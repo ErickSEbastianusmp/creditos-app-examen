@@ -110,7 +110,7 @@ public class SolicitudController : Controller
 
         if (cliente is null)
         {
-            TempData["Error"] = "No tienes un perfil de cliente registrado.";
+            TempData["Error"] = "No tienes un perfil de cliente registrado y no se pudo generar uno automáticamente.";
             return RedirectToAction(nameof(MisSolicitudes));
         }
 
@@ -238,9 +238,27 @@ public class SolicitudController : Controller
         return model;
     }
 
-    private Task<Cliente?> ObtenerClienteAsync(string? usuarioId)
+    private async Task<Cliente?> ObtenerClienteAsync(string? usuarioId)
     {
-        return _db.Clientes.FirstOrDefaultAsync(c => c.UsuarioId == usuarioId);
+        if (string.IsNullOrEmpty(usuarioId)) return null;
+
+        var cliente = await _db.Clientes.FirstOrDefaultAsync(c => c.UsuarioId == usuarioId);
+
+        // Si el cliente no existe para este usuario recién registrado, lo crea automáticamente
+        if (cliente == null)
+        {
+            cliente = new Cliente
+            {
+                UsuarioId = usuarioId,
+                IngresosMensuales = 5000, // Valor por defecto
+                Activo = true
+            };
+
+            _db.Clientes.Add(cliente);
+            await _db.SaveChangesAsync();
+        }
+
+        return cliente;
     }
 
     private async Task<List<SolicitudViewModel>> ProyectarAsync(IQueryable<SolicitudCredito> consulta)
