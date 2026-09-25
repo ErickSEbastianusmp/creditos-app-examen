@@ -13,13 +13,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-var redisConnectionString = builder.Configuration["Redis__ConnectionString"] ?? "localhost:6379";
-
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = redisConnectionString;
-    options.InstanceName = "CreditosApp";
-});
+// Opciones de Cache local para evitar dependencias fallidas de Redis en Render
+builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSession(options =>
 {
@@ -30,8 +25,9 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddScoped<SolicitudCache>();
 
-builder.Services.AddSingleton<IRabbitMQService, RabbitMQPublisher>();
-builder.Services.AddHostedService<NotificacionConsumerService>();
+// Comentados temporalmente para evitar fallos por falta de servidor RabbitMQ/Redis en Render
+// builder.Services.AddSingleton<IRabbitMQService, RabbitMQPublisher>();
+// builder.Services.AddHostedService<NotificacionConsumerService>();
 
 builder.Services.AddSignalR(options =>
 {
@@ -50,17 +46,8 @@ using (var scope = app.Services.CreateScope())
     await DbInitializer.InitializeAsync(scope.ServiceProvider);
 }
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseMigrationsEndPoint();
-}
-else
-{
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
+// Forzar la pantalla de error detallada de desarrollador
+app.UseDeveloperExceptionPage();
 
 app.UseHttpsRedirection();
 app.UseRouting();
@@ -81,9 +68,6 @@ app.MapControllerRoute(
 app.MapRazorPages()
    .WithStaticAssets();
 
-app.MapHub<SolicitudesHub>("/hubs/solicitudes", options =>
-{
-    options.Transports = HttpTransportType.WebSockets;
-});
+app.MapHub<SolicitudesHub>("/hubs/solicitudes");
 
 app.Run();
