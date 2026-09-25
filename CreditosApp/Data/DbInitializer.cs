@@ -1,6 +1,12 @@
 using CreditosApp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CreditosApp.Data;
 
@@ -13,9 +19,26 @@ public static class DbInitializer
     public static async Task InitializeAsync(IServiceProvider services)
     {
         using var scope = services.CreateScope();
+        var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+        // Verificar y crear el directorio de la base de datos si no existe (evita error SQLite 14)
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        if (!string.IsNullOrEmpty(connectionString) && connectionString.Contains("Data Source=", StringComparison.OrdinalIgnoreCase))
+        {
+            var parts = connectionString.Split("Data Source=", StringComparison.OrdinalIgnoreCase);
+            if (parts.Length > 1)
+            {
+                var dbPath = parts[1].Split(";")[0];
+                var directory = Path.GetDirectoryName(dbPath);
+                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+            }
+        }
 
         await db.Database.MigrateAsync();
 
