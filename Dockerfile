@@ -14,6 +14,7 @@ WORKDIR /app
 COPY --from=build /app/publish .
 
 ENV ASPNETCORE_URLS=http://0.0.0.0:8080
+ENV ASPNETCORE_ENVIRONMENT=Development
 EXPOSE 8080
 
 ENTRYPOINT ["sh", "-c", "dotnet CreditosApp.dll --urls http://0.0.0.0:${PORT}"]
