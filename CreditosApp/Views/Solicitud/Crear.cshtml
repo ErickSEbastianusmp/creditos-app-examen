@@ -1,0 +1,31 @@
+@model CrearSolicitudViewModel
+@{
+    ViewData["Title"] = "Nueva solicitud de crédito";
+}
+
+<h1>Nueva solicitud de crédito</h1>
+<hr />
+
+<form asp-controller="Solicitud" asp-action="Crear" method="post" class="border rounded p-3 mb-4 bg-light" style="max-width: 640px;">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <dl class="row mb-3">
+        <dt class="col-sm-8">Ingresos mensuales</dt>
+        <dd class="col-sm-4"><strong>@Model.IngresosMensuales.ToString("C")</strong></dd>
+        <dt class="col-sm-8">Monto máximo solicitable (10x ingresos)</dt>
+        <dd class="col-sm-4"><strong>@Model.LimiteMaximo.ToString("C")</strong></dd>
+    </dl>
+
+    <div class="mb-3">
+        <label asp-for="MontoSolicitado" class="form-label"></label>
+        <input asp-for="MontoSolicitado" class="form-control" type="number" step="0.01" min="0.01" />
+        <span asp-validation-for="MontoSolicitado" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Crear solicitud</button>
+    <a asp-controller="Solicitud" asp-action="MisSolicitudes" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,12 @@
+@{
+    var usuarioAutenticado = User.Identity?.IsAuthenticated == true;
+}
+@if (usuarioAutenticado)
+{
+    <div class="mb-3 d-flex gap-2 align-items-center">
+        <span class="text-muted small">Tiempo real:</span>
+        <span id="signalr-estado" class="badge bg-secondary">Desconectado</span>
+    </div>
+    <script src="~/lib/signalr/signalr.min.js"></script>
+    <script src="~/js/signalr-solicitudes.js"></script>
+}

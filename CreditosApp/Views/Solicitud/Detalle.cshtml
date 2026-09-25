@@ -1,0 +1,54 @@
+@model SolicitudViewModel
+@{
+    ViewData["Title"] = "Detalle de la solicitud";
+}
+
+<h1>Detalle de la solicitud #@Model.Id</h1>
+<hr />
+
+<partial name="_SolicitudesSignalR" />
+
+<dl class="row">
+    <dt class="col-sm-3">Id</dt>
+    <dd class="col-sm-9">@Model.Id</dd>
+
+    <dt class="col-sm-3">Cliente</dt>
+    <dd class="col-sm-9">@Model.EmailCliente</dd>
+
+    <dt class="col-sm-3">Ingresos mensuales del cliente</dt>
+    <dd class="col-sm-9">@Model.IngresosMensuales.ToString("C")</dd>
+
+    <dt class="col-sm-3">Monto solicitado</dt>
+    <dd class="col-sm-9">@Model.MontoSolicitado.ToString("C")</dd>
+
+    <dt class="col-sm-3">Fecha de solicitud</dt>
+    <dd class="col-sm-9">@Model.FechaSolicitud.ToString("dd/MM/yyyy HH:mm")</dd>
+
+    <dt class="col-sm-3">Estado</dt>
+    <dd class="col-sm-9">
+        <span class="badge @ClaseEstado(Model.Estado)" data-solicitud-id="@Model.Id">@TextoEstado(Model.Estado)</span>
+    </dd>
+
+    <dt class="col-sm-3">Motivo de rechazo</dt>
+    <dd class="col-sm-9" data-solicitud-motivo="@Model.Id">@(string.IsNullOrWhiteSpace(Model.MotivoRechazo) ? "—" : Model.MotivoRechazo)</dd>
+</dl>
+
+<div>
+    <a asp-controller="Solicitud" asp-action="MisSolicitudes" class="btn btn-secondary">Volver a Mis Solicitudes</a>
+</div>
+
+@functions {
+    string TextoEstado(EstadoSolicitud estado) => estado switch
+    {
+        EstadoSolicitud.Pendiente => "Pendiente",
+        EstadoSolicitud.Aprobado => "Aprobado",
+        _ => "Rechazado"
+    };
+
+    string ClaseEstado(EstadoSolicitud estado) => estado switch
+    {
+        EstadoSolicitud.Pendiente => "bg-secondary",
+        EstadoSolicitud.Aprobado => "bg-success",
+        _ => "bg-danger"
+    };
+}

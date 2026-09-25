@@ -3,6 +3,7 @@ using System;
 using CreditosApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CreditosApp.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260925030507_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.12");
@@ -41,38 +44,6 @@ namespace CreditosApp.Data.Migrations
                         {
                             t.HasCheckConstraint("CK_Clientes_IngresosMensuales_Positive", "[IngresosMensuales] > 0");
                         });
-                });
-
-            modelBuilder.Entity("CreditosApp.Models.Notificacion", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("FechaProcesamientoUtc")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("MessageId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("SolicitudId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Texto")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UsuarioId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MessageId")
-                        .IsUnique();
-
-                    b.ToTable("Notificaciones");
                 });
 
             modelBuilder.Entity("CreditosApp.Models.SolicitudCredito", b =>
