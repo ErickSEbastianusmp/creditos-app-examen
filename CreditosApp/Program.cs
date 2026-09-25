@@ -25,9 +25,8 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddScoped<SolicitudCache>();
 
-// Comentados temporalmente para evitar fallos por falta de servidor RabbitMQ/Redis en Render
-// builder.Services.AddSingleton<IRabbitMQService, RabbitMQPublisher>();
-// builder.Services.AddHostedService<NotificacionConsumerService>();
+// Registrar el servicio nulo de RabbitMQ para que SolicitudController no falle al inyectarlo
+builder.Services.AddSingleton<IRabbitMQService, NullRabbitMQService>();
 
 builder.Services.AddSignalR(options =>
 {
